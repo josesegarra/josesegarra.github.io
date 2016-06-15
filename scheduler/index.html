@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Sej Scheduler</title>
+    <style>
+        .CSSshadow {
+            -moz-box-shadow:    1px 1px 1px 1x #aaa;
+            -webkit-box-shadow: 1px 1px 1px 1px #aaa;
+            box-shadow:         1px 1px 1px 1px #aaa;
+        }
+    
+        html {
+            height: 100%
+        }
+        body {
+            height: 95%;
+            font-family: "Lucida Console", Monaco, Courier,monospace;
+            font-size: 12px;
+        }
+    </style>
+    <script src="MyCore.js"  type="text/javascript"></script>                
+    <script src="MyThemes.js" type="text/javascript"></script>
+
+    <script src="MySampleData.js" type="text/javascript"></script>
+    <script src="MyPanel.js" type="text/javascript"></script>               
+    <script src="MyScheduler_ViewScheduler.js" type="text/javascript"></script>
+    <script src="MyScheduler_ViewDays.js"      type="text/javascript"></script>
+    <script type=" text/javascript">
+       var panel;
+       var scheduler0,scheduler1,scheduler2;
+       
+       function Init()
+       {
+           var where = document.getElementById("myDiv");
+           $sej.utils.log("$sej library", "Version: " + $sej.version());
+
+           var data = window.$sej.generateSamples();
+           console.log("Generated " + data.length + " samples");
+
+           panel = $sej.create("panel",where);
+            
+           scheduler0=$sej.create("scheduler",panel.addDisplay());
+           scheduler0.addData(data, function(d) { return d.room;});                                      // Set data & classification function
+           
+           scheduler1=$sej.create("scheduler",panel.addDisplay());
+           scheduler1.addData(data, function(d) { return d.tech;});                                      // Set data & classification function
+           
+           scheduler2=$sej.create("days",panel.addDisplay());
+           scheduler2.addData(data);                                                                     // Set data 
+
+       }
+    </script>
+
+</head>
+<body onload="Init()">
+    <div>THIS IS HEADER</div>
+    <div style="float:left;margin-right:10px">LEFT MARGIN
+    <br /><a href="#" onclick="panel.show(0, true); scheduler0.update();">Schedule by Room</a>
+    <br /><a href="#" onclick="panel.show(1, true); scheduler1.update();">Schedule by Tech</a>
+    <br /><a href="#" onclick="panel.show(2, true); scheduler2.update();">Day View</a>
+
+    </div>
+    <div id="myDiv" style="float:left;border: 1px solid darkblue; padding: 1px;width: 80%; height: 95%">
+    </div>
+</body>
+</html>
