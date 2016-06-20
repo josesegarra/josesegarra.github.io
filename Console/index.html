@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Sample1</title>
+    <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
+    <script language="javascript" src="resources/script/core.js" ></script>
+    <script language="javascript" src="resources/script/core.UI.js"></script>
+
+    <script language="javascript" src="resources/script/core.controls.terminal.js"></script>
+    <script language="javascript" src="resources/script/core.controls.terminal.ext.js"></script>
+
+    
+    <script language="javascript">
+
+        $J.application.onInit(
+            function () {
+                var terminal= $J.terminal("main");                                              // Create a terminal in MAIN, overriding style.DISPLAY
+                terminal.onCommand(doCommand,28);
+            }
+        );
+
+        function doCommand(data){
+            if (data.value) console.log("COMMAND: " + data.value);
+        }
+
+    </script>
+
+</head>
+<body >
+    <div id="main" style="width:80%;position:absolute;bottom:10px;top:10px;border: 1px solid #24a3ed;"></div>
+</body>
+</html>
