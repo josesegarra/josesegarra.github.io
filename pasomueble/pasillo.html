@@ -1,0 +1,161 @@
+<html>
+<head>
+    <script>
+        var marginTop = 30;
+        var pasilloX = 93;
+        var pasilloY = 110;
+        var anchoA = 49;
+        var largoA= 170;
+        var pX = 2 * pasilloX;
+        var pY = marginTop + pasilloY;
+        var R = 0;
+
+        function ls(v,k) {
+            for (var i = 0; i <250; i++) {
+                var opt = document.createElement('option');
+                opt.innerHTML = i;
+                opt.value = i;
+                v.appendChild(opt);
+                if (i == k) v.selectedIndex = i;
+            }
+        }
+
+        function cambia(s,k) {
+            var v = s.options[s.selectedIndex].value;
+            log.innerHTML = "";
+            if (k == 1) pasilloX = v;
+            if (k == 2) pasilloY = v;
+            if (k == 3) anchoA = v;
+            if (k == 4) largoA = v;
+            log.innerHTML = "Set "+k+" = " + v;
+            draw();
+            window.focus();
+            if (document.activeElement) document.activeElement.blur();
+        }
+
+        function go(){
+            ls(document.getElementById("ancho1"), pasilloX);
+            ls(document.getElementById("ancho2"), pasilloY);
+            ls(document.getElementById("a1"), anchoA);
+            ls(document.getElementById("a2"), largoA);
+
+            var log = document.getElementById("log");
+            draw();
+
+            document.onkeydown = function (evt) {
+                evt = evt || window.event;
+                if (evt.keyCode == 38) {
+                    pY = pY - 2;
+                    log.innerHTML = log.innerHTML + "Adelante 2 cm<br/>";
+                    draw();
+                    return;
+                }
+
+                if (evt.keyCode == 40) {
+                    pY = pY + 2;
+                    log.innerHTML = log.innerHTML + "Atras 2 cm<br/>";
+                    draw();
+                    return;
+                }
+
+                if (evt.keyCode == 37) {
+                    pX = pX - 2;
+                    log.innerHTML = log.innerHTML + "Izquierda 2 cm<br/>";
+                    draw();
+                    return;
+                }
+
+                if (evt.keyCode == 39) {
+                    pX = pX + 2;
+                    log.innerHTML = log.innerHTML + "Derecha 2 cm<br/>";
+                    draw();
+                    return;
+                }
+                if (evt.keyCode == 90) {
+                    R = R - 2.5;
+                    log.innerHTML = log.innerHTML + "Gira -2.5º<br/>";
+                    draw();
+                    return;
+                }
+
+                if (evt.keyCode == 88) {
+                    R = R + 2.5;
+                    log.innerHTML = log.innerHTML + "Gira +2.5º<br/>";
+                    draw();
+                    return;
+                }
+
+                console.log(evt.keyCode);
+                //if (evt.keyCode==32) m(context);
+            };
+        }
+
+
+
+        function dibuja(c) {
+            c.save();
+            c.fillStyle = "red";
+            c.translate(pX+anchoA/2, pY+largoA/2);
+            c.rotate(R * Math.PI / 180);
+            c.fillRect(-anchoA/2, -largoA/2, anchoA, largoA);
+            c.restore();
+        }
+
+
+        
+
+        function draw() {
+            var c= document.getElementById("canvasId").getContext("2d");
+
+            c.clearRect(0, 0, 500, 500);
+            c.beginPath();
+            c.strokeStyle = "#000000";
+            c.moveTo(0, marginTop);
+            c.lineTo(3 * pasilloX, marginTop);
+            c.lineTo(3 * pasilloX, marginTop+3*pasilloY);
+            c.moveTo(0, marginTop+pasilloY);
+            c.lineTo(2 * pasilloX, marginTop + pasilloY);
+            c.lineTo(2 * pasilloX, marginTop + 3*pasilloY);
+            c.stroke();
+            c.beginPath();
+            c.strokeStyle = "blue";
+            c.moveTo(2 * pasilloX, marginTop + 3 * pasilloY-30);
+            c.lineTo(3 * pasilloX, marginTop + 3 * pasilloY - 30);
+            c.strokeText(pasilloX + " cm", 2 * pasilloX + pasilloX / 2 - 30, marginTop + 3 * pasilloY - 33);
+            c.moveTo(30, marginTop);
+            c.lineTo(30, marginTop+pasilloY);
+            c.strokeText(pasilloY + " cm", 40, marginTop+pasilloY/2);
+            c.stroke();
+            
+          
+            dibuja(c);
+        }
+
+        setTimeout(go,500);
+    </script>
+</head>
+<body>
+    
+    <table>
+        <tr>
+            <td>
+                <canvas id="canvasId" width="400" height="400" style="border:1px solid blue"></canvas>
+            </td>
+            <td>
+                <div style="border:1px solid #808080;width:400px;font-family:arial;font-size: 12px;">
+                    Ancho pasillo 1: <select id="ancho1" onchange="cambia(this,1)"></select><br/>
+                    Ancho pasillo 2: <select id="ancho2" onchange="cambia(this, 2)"></select><br />
+                    Ancho bulto: <select id="a1" onchange="cambia(this, 3)"></select><br />
+                    Largo bulto: <select id="a2" onchange="cambia(this, 4)"></select><br />&nbsp;<br />
+                    usa flechas para mover bulto, Z y X para girar
+                </div>
+                <div id="log" style="border:1px solid #808080;width:400px;height:400px;font-family:arial;font-size: 12px;overflow-y:scroll">
+                        Pulsa cualquier tecla<br />
+                    </div>
+</td>
+        </tr>
+
+    </table>
+
+</body>
+</html>
