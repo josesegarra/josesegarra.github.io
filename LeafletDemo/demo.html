@@ -1,0 +1,81 @@
+<html>
+<head>
+    <link rel="stylesheet" href="js/leaflet.css" />
+    <script src="js/leaflet.js"></script>
+    <script src="geodata.js"></script>
+
+    <script type="text/javascript">
+
+        (function () {
+
+            var drawnItems;
+
+            var getCentroid = function (arr) {
+                return arr.reduce(function (x, y) {
+                    return [x[0] + y[0] / arr.length, x[1] + y[1] / arr.length]
+                }, [0, 0])
+            }
+
+
+            function onEachFeature(feature, layer) {
+                if (feature.id == "BRA")
+                {
+                    var center = getCentroid(feature.geometry.coordinates[0]);
+                    L.marker([center[1],center[0]]).addTo(drawnItems);
+                    console.log("Setting a marker on BRASIL");
+                }
+
+                layer._feature = feature;
+                layer.on("click", function (e) {
+                    alert("You clicked on "+feature.properties.name);
+                });
+            }
+
+            function onStyle(feature) {
+                if (feature.id=="CHN") console.log("Painting china in red");
+                return {
+                    weight: 1,
+                    opacity: 1,
+                    color: 'black',
+                    fillOpacity: 0.7,
+                    fillColor: feature.id=="CHN" ? '#FF0000' : '#FFFFFF'
+                }
+            }
+
+            function init() {
+    
+                var mymap = L.map('mapid').setView([51.505, -0.09], 2);
+                drawnItems = new L.FeatureGroup();
+                mymap.addLayer(drawnItems);
+
+                var geoJsonLayer = L.geoJSON(geodata, {
+                    onEachFeature: onEachFeature,
+                    style: onStyle
+                }).addTo(mymap);
+
+
+
+                geoJsonLayer.eachLayer(function (layer) {
+                    layer._path.addEventListener('mouseover', function (evt) {                                                                           // On country over
+                        layer._path.setAttribute('fill', 'yellow');
+                        console.log("Entering " + layer._feature.properties.name);
+
+                    });
+                    layer._path.addEventListener('mouseout', function (evt) {                                                                           // On country out
+                        layer._path.setAttribute('fill', 'white');
+                        console.log("Leaving " + layer._feature.properties.name);
+                    });
+                });
+
+            };
+
+            if (document.readyState === "complete" || (document.readyState !== "loading" && !document.documentElement.doScroll)) init(); else document.addEventListener("DOMContentLoaded", init);
+        })();
+    </script> 
+
+</head>
+<body>
+    <div id="mapid" style="position:absolute ; top:30px; left: 30px; bottom: 30px;right:30px; border: 1px solid blue"></div>
+
+</body>
+</html>
