@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script language="javascript">
+		function go(){
+			console.clear();
+			console.log("The following information might be exposed !!!");
+			var p = performance.getEntries();
+			for (var i=0; i < p.length; i++) {
+				console.log("PerformanceEntry[" + i + "]");
+				console.log(p[i]);
+				}
+		}
+	</script>
+</head>
+<body style="font: 12px arial;height:100%">
+	<table width="100%" height="500px" style="border: 1px solid red">
+	<tr>
+		<td><embed src="r0.html" width="1000" height="90%"></td>
+		<td><a href="#" onclick="javascript:go();">Click to check performance OBJECT in console</a></td>
+	</tr>
+</table>
+</body>
+</html>
