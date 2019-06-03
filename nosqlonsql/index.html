@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <style data-react-helmet="true" type="text/css">
+
+        /* DOTNET RUN */
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 100;
+            src: local('Roboto Thin'), local('Roboto-Thin'), url('./fonts/roboto-v19-latin-100.woff') format('woff'), /* Modern Browsers */
+            url('./fonts/roboto-v19-latin-100.ttf') format('truetype'); /* Safari, Android, iOS */
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Roboto'), local('Roboto-Regular'), url('./fonts/roboto-v19-latin-regular.woff') format('woff'), /* Modern Browsers */
+            url('./fonts/roboto-v19-latin-regular.ttf') format('truetype'); /* Safari, Android, iOS */
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 500;
+            src: local('Roboto'), local('Roboto-Regular'), url('./fonts/roboto-v19-latin-500.woff') format('woff'), /* Modern Browsers */
+            url('./fonts/roboto-v19-latin-500.ttf') format('truetype'); /* Safari, Android, iOS */
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 700;
+            src: local('Roboto'), local('Roboto-Regular'), url('./fonts/roboto-v19-latin-700.woff') format('woff'), /* Modern Browsers */
+            url('./fonts/roboto-v19-latin-700.ttf') format('truetype'); /* Safari, Android, iOS */
+        }
+
+        .topblock {
+            background-color: rgb(255, 255, 255);
+            border-bottom: 1px solid rgb(212, 218, 223);
+            box-shadow: rgba(116, 129, 141, 0.1) 0px 3px 8px 0px;
+            box-sizing: border-box;
+            color: rgb(36, 42, 49);
+            font-family: Roboto, sans-serif;
+            font-size: 15px;
+            height: 80px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .title0 {
+            color: rgb(48, 42, 49);
+            font-family: Roboto,sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            width: 220px;
+            border-right: 1px rgb(230, 236, 241) solid;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-top: 15px;
+            text-align: right;
+            padding-right: 30px
+        }
+
+        .left {
+            background-color: rgb(245, 247, 249);
+            height: 100%;
+            width: 250px;
+            min-width: 250px;
+            max-width: 250px;
+            border-right-color: rgb(230, 236, 241);
+            border-right-style: solid;
+            border-right-width: 1px;
+        }
+
+        .menutext {
+            color: rgb(92, 105, 117);
+            cursor: pointer;
+            font-family: Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 25px;
+            padding-left: 8px;
+        }
+
+            .menutext:hover {
+                background-color: rgb(230, 236, 241);
+            }
+
+        .menutitle {
+            color: rgb(157, 170, 182);
+            display: block;
+            font-family: Roboto, sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            padding-bottom: 5px;
+        }
+
+        .mmenuspace {
+            height: 15px;
+        }
+
+        .coolscroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+            display: none;
+        }
+
+        .coolscroll::-webkit-scrollbar-track {
+            background: none;
+            border-width: 0;
+        }
+
+        .coolscroll::-webkit-scrollbar-thumb {
+            transition: background 250ms ease;
+            background: rgba(0,0,0,.16);
+            border-radius: 2px;
+            -moz-transition: background 250ms ease;
+            -webkit-transition: background 250ms ease;
+        }
+
+        .coolscroll::-webkit-scrollbar-button {
+            display: none;
+        }
+
+        .coolscroll::-webkit-scrollbar-track-piece {
+            display: none;
+        }
+
+        .coolscroll::-webkit-scrollbar-corner {
+            display: none;
+        }
+
+        .coolscroll::-webkit-resizer {
+            display: none;
+        }
+
+        .coolscroll:hover::-webkit-scrollbar {
+            display: initial;
+        }
+
+        .coolscroll:hover::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,.16);
+        }
+
+        em {
+            color: royalblue;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .banner {
+            background-color: rgb(230, 236, 241);
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            box-sizing: border-box;
+            font-family: Roboto,sans-serif;
+            font-size: 12px;
+            font-weight: 100;
+            padding: 10px;
+            color: rgb(157, 170, 182);
+        }
+
+        #content {
+            font-family: Roboto,sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: rgb(57, 70, 82);
+            line-height: 1.5em;
+        }
+        #content div{
+            width:60%;
+            border: 1px solid #EEE;
+        }
+
+
+        @media screen and (max-width: 600px) {
+            .infotext p {
+                width: 99%;
+            }
+        }
+
+        @media screen and (max-width: 1000px) {
+            .infotext p {
+                width: 10%;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="/docs/styles/default.css">
+    <script src="/docs/js/highlight.pack.js"></script>
+    <script src="/docs/js/showdown.min.js"></script>
+
+    <script src="/docs/js/format.js"></script>
+    <script src="/docs/js/format_quote.js"></script>
+    <script src="/docs/js/format_data.js"></script>
+    <script src="/docs/js/format_code.js"></script>
+    <script src="/docs/js/format_markdown.js"></script>
+
+
+    <script language="javascript">
+        /*
+        hljs.configure({
+            tabReplace: '    '
+            //,classPrefix: ''
+            , languages: ["sql", "json"]// … other options aren't changed
+        })
+
+
+        function asCode(s, k) {
+            var l = s.split("\n");
+            var code = document.createElement("DIV");
+            code.innerHTML = "<div class='codeblock'><div id='lines' ></div>" +
+                "<div style='max-width:100%;overflow-x:auto'><div style='padding:0px;overflow-x:hidden'><pre><code>" + s + "</pre></code></div></div></div>";
+            code.style.paddingLeft = "15px";
+            code.style.width = "90%";
+            var lines = code.querySelector("#lines");
+            if (lines) {
+                var s = "";
+                for (let p = 1; p <= l.length + k; p++) s = s + p + "</br>";
+                lines.innerHTML = "<pre style='height:100%'><code>" + s + "</code></pre>";
+                lines.style.overflowY = "hidden";
+            }
+            return code;
+        }
+
+
+
+
+        var converter = new showdown.Converter({ tables: true, strikethrough: true });
+        docParser.plugin("markdown", (s) => "<div class='infotext'>" + converter.makeHtml(s) + "</div>");
+        docParser.plugin("quote", (s) => "<div class='infotext'>" + quoteFormat.makeHtml(s) + "</div>");
+        docParser.plugin("code", (s) => codeFormat.makeHtml(s));
+        */
+
+        /*
+        docParser.plugin("code", (s) => {
+            s = codeFormat.nosql(s);
+            return asCode(s, 0);
+        });
+
+
+        docParser.plugin("quote", (s) => {
+            s = dataFormat(s);
+            return asCode(s, 2);
+        });
+
+        docParser.plugin("data", (s) => {
+            s = dataFormat(s);
+            return asCode(s, 2);
+        });
+        */
+
+        function display(s) {
+            var where = document.getElementById("content");
+            where.innerHTML = "";
+            format.process(where, s);
+        }
+
+        function load(url) {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) display(xhr.responseText); else alert('The request failed!');
+            };
+            xhr.open('GET', url);
+            xhr.send();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            load("00_intro.txt");
+        });
+
+    </script>
+</head>
+
+<body style="position: absolute; left:2px;top:2px;right:2px;bottom:2px;">
+    <div class="topblock">
+        <div class="title0" >NoSqlOnSql</div>
+    </div>
+
+    <div style="position:absolute;top:81px;left:0px;bottom:0px;right:0px;display:flex;flex-direction:row">
+        <div class="left" style="display:flex;flex-direction:row;flex-basis:250px;flex-grow:0">
+            <div style="flex-grow:1"></div>
+            <div style="flex-grow:1;flex-basis:200px;display:flex;flex-direction:column">
+                <div class="coolscroll" style="flex-grow:1;overflow-y:auto;overflow-x:hidden">
+                    <div class="menuspace">&nbsp;</div>
+                    <div class="menuspace">&nbsp;</div>
+                    <div class="menutitle">CORE CONCEPTS</div>
+                    <div class="menutext" onclick="load('00_intro.txt');">Intro</div>
+                    <div class="menutext" onclick="load('01_documents.txt');">Documents</div>
+                    <!-- <div class="menutext" onclick="load('02_internals.txt');">Internals</div> -->
+                    <div class="menuspace">&nbsp;</div>
+                    <div class="menutitle">STATEMENTS</div>
+                    <div class="menutext" onclick="load('03_syntax.txt');">Syntax</div>
+                    <div class="menutext" onclick="load('04_create.txt');">Create statement</div>
+                    <div class="menutext" onclick="load('05_insert.txt');">Insert statement</div>
+                    <div class="menutext" onclick="load('06_select.txt');">Select statement</div>
+                    <div class="menutext" onclick="load('07_update.txt');">Update statement</div>
+                    <div class="menutext">Show</div>
+                    <div class="menutext">Create Set</div>
+                    <div class="menutext">Go</div>
+                    <div class="menuspace">&nbsp;</div>
+
+                    <div class="menutitle">MISC</div>
+                    <div class="menutext">Integration</div>
+                    <div class="menutext">BlockChain</div>
+
+                </div>
+                <div style="flex-grow:0;flex-basis:40px;padding:5px">
+
+                    <div class="banner">NoSqlOnSql 2019-05</div>
+                </div>
+                </div>
+        </div>
+        <div id="content" class="coolscroll" style="flex-grow:1;flex-shrink:1;padding:20px;overflow-y:auto;overflow-x:hidden">
+        </div>
+    </div>
+
+</body>
+</html>

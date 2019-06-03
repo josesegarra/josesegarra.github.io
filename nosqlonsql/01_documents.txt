@@ -1,0 +1,116 @@
+﻿
+
+[markdown]
+# Documents
+
+A NoSqlOnSql document is similar to a JSON document. A document is a group of values belonging to a single entity, this entity is the document itself. Values in NoSqlOnSql must be of one of the following types:
+
+- **string** any sequence of unicode chars, are stored internally as a NVARCHAR(MAX) TSQL value. 
+- **integer** numbers (ie: <span style="color:blue">12</span>, <span style="color:blue">-32</span>,<span style="color:blue">...</span>) they must fit between the limits of the TSQL int type.
+- **real** numbers (ie: <span style="color:blue">12.2818</span>, <span style="color:blue">-32.3821</span>,<span style="color:blue">...</span>) are stored internally as TSQL float values.
+- **documents**: a document can contain other nested documents. 
+
+There are two types of documents: objects and arrays. The difference between them is the mechanism used to locate the values within the document. 
+
+- **Objects** organize values using names, each name (or key) is associated to a single value. Values in an object are accessed using the name as key. 
+- **Arrays** organize values using a list. The position of a value in the list is determined by its order of creation in the array. Values in an array document are accessed by their position. 
+
+## Document syntax 
+
+NoSqlOnSql document syntax is a mix of JSON,  TSQL and own syntax:
+
+- **Integers** only numbers in decimal notation (ie: no hexadecimal or binary), negative numbers require a 
+<span style="color:blue"><span style="font-weigth: bold;">-</span> <span style="font-style: italic;font-size:10px">(minus sign)</span></span> prefix.
+- **Real** only numbers using the <span style="color:blue"><span style="font-weigth: bold;">.</span> <span style="font-style: italic;font-size:10px">(decimal point)</span></span> as separator.
+- **Strings** must be enclosed in single quotes, the same escaping rules as in TSQL apply: <span style="color:blue">'This is a string'</span>.
+- **Document objects** as in JSON, must be enclosed in brackets <span style="color:blue;font-size:15px">{  }</span>, also key-values pairs are separated by commas, and contrary to JSON keys must be single words and not quoted.
+- **Array objects** as in JSON, must be enclosed in square brackets <span style="color:blue;font-size:15px">[ ]</span>, also values pairs must be separated by commas.
+
+
+[/markdown]
+[code]
+{
+  Name: 'Alan O''''Hara'                            -- This is a string, we are scaping the single quote, so the value for Name is [O'Hara]
+ ,IQ: 114.32                                      -- This is a real number
+ ,Age: 34                                         -- This is an integer
+ ,Today: CONVERT(nvarchar(10), getdate(), 103)    -- Today's date, using TSQL functions
+}
+
+[/code]
+
+[markdown]
+## Denormalization
+
+A document is *denormalized* if all its related information is stored within the document itself. Depending on the use case, it 
+might make sense to keep all documents denormalized or on the other hand, to keep related information in different documents and 
+maintain this relation among them using references. 
+
+For example the following three documents (*doc1*, *doc2* and *doc3* ) representing three persons are denormalized:
+
+[/markdown]
+[code]
+doc1: {  Name: 'Maude',Lastname:'Flanders' }
+
+doc2: {  Name: 'Todd',Lastname:'Flanders' }
+
+doc3: {  Name: 'Rodd',Lastname:'Flanders' }
+[/code]
+[markdown]
+If we wanted to store the fact that Maude is the ___mother___ of Todd and Rodd, we would need to modify *doc2* and *doc3* adding a new property ___mother___ and include Maude's information in it. We could do this in 
+a normalized way, like this:
+[/markdown]
+[code]
+doc1: {  Name: 'Maude',Lastname:'Flanders' }
+
+doc2: {   
+        Name: 'Todd',Lastname:'Flanders', 
+	    Mother:{ Name: 'Maude',Lastname:'Flanders'}
+      }
+
+doc3: {
+        Name: 'Rodd',Lastname:'Flanders', 
+	    Mother:{ Name: 'Maude',Lastname:'Flanders'}
+      }
+[/code]
+[markdown]
+The biggest advantage of normalized data is its completeness: each document is fully complete as it contains all the data it uses. This provides 
+robustness (ie: if the object Maude is deleted, the information for Todd & Rodd is still correct) and speed (when retrieving the values for Todd and Rodd and additional retrieval of Maude is not needed). 
+
+On the other hand, normalized data has some disadvantages:
+* We have redundancy in the system, as in our sample three documents are defining Maude:
+    * in the original *doc1*, 
+    * another document in property *doc2.Mother* 
+    * and the the third one in *doc3.Mother*. 
+  As all documents model the same real-world entity, we need to keep them synchronized to maintain consistency: any change to object Maude would need to be applied to all three documents. 
+* Symmetric and anti-symmetric relationships cannot be modeled (if we wanted to store in Maude a property "Son" with Todd's data, we would run into and infinite loop).
+
+Another option is to break normalization by using document references:
+[/markdown]
+[code]
+doc1: {  Name: 'Maude',Lastname:'Flanders' }
+
+doc2: {   
+        Name: 'Todd',Lastname:'Flanders', 
+	    Mother:^doc1                        -- This is a reference to DOC1
+      }
+
+doc3: {
+        Name: 'Rodd',Lastname:'Flanders', 
+	    Mother:^doc1                        -- This is a reference to DOC1
+      }
+
+[/code]
+[markdown]
+Using references, any change to *doc1* will inmediately be available to *doc2.Mother* and *doc3.Mother*. The biggest drawback to this approach is that a document is not a self-contained entity anymore. Documents are 
+referenced among themselves, and, to get completeness for a document (ie: get all the data we need to fetch related documents. 
+
+## Universes
+
+To keep track of what documents are related among themselves NoSqlOnSql defines a bigger structure called **universe**. In NoSqlOnSql all referenced must documents live within the same universe. Besides 
+handling document references, the universe provides storage and persistance in NoSqlOnSql. 
+ 
+Internally NoSqlOnSql stores documents in a denormalized manner. The universe is the mechanism that, among other functions, manages the references among the documents. Denormalization and normalization 
+operations are managed transparently by the NoSqlOnSql engine.
+
+[/markdown]
+

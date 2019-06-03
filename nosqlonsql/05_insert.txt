@@ -1,0 +1,59 @@
+﻿
+
+[markdown]
+# Insert
+
+This statement stores a document into the root level of an universe. 
+
+##	 Syntax
+<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>
+&lt;insert statement&gt; ::= nosql insert [[new object] **@VARIABLE=**] 
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**NOSQL-DOCUMENT** into **UNIVERSE-NAME**</span>
+
+Where:
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**@VARIABLE**</span> is an optional TSQL variable that receives a reference to the inserted document in the universe. Internally this variable is of type **integer**. 
+If the <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>new object</span> option is included then the transpiler generates code to create the 
+TSQL variable.
+
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**NOSQL-DOCUMENT**</span> is a NoSqlOnSql document of type **object**. As all documents of 
+type **Array** share the same **shape**, inserting them at the root level is disabled. **Arrays** can only be stored as properties of other 
+documents.
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE-NAME**</span> is the name of the universe where the object is stored. 
+
+##	 Sample
+[/markdown]
+
+
+[code]
+
+nosql create springfield override	                                          -- Create a new universe called SpringField, delete any previous storage of the same name
+    
+nosql insert new object @Ned={Name: 'Ned'	                                  -- Ned exists in Springfield
+        ,Likes:['Church','Bible']
+		} into springfield               
+
+nosql insert {Name: 'Maude'                                                   -- Maude also exists in Springfield and Ned is her spouse
+        ,Spouse:^(@Ned)
+        ,Likes:['Ficus plants','Unflavored nonfat ice milk']
+        }  into springfield                            
+        
+nosql select $Name,$Spouse.Name,$Likes[0],$Likes[1] from springfield          -- Let's see the data we have inserted
+
+[/code]
+
+[markdown]
+&nbsp;
+[/markdown]
+[data]
+# |name      |  spousename     |likes0          |likes1
+--|----------|  ----------     |------------    |--------------------------
+1 |Ned       |  null           |Church          |Bible
+2 |Maude     |  Ned            |Ficus plants    |Unflavored nonfat ice milk
+
+
+[/data]
+
+

@@ -1,0 +1,94 @@
+﻿
+
+[markdown]
+# Update
+
+Updates one or more properties for a set of objects belonging to a universe or included in a subset of an universe. The objects to be updated 
+are selected using a <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**FILTER-CONDITION**</span> similar to the one defined in a **nosql select statement**.
+
+For each affected object, a new definition and value for the property is defined within the object. The NoSqlOnSql engine uses an internal timestamp to return the latest value for a property within an object. Previous versions 
+of properties for an object can be queried using the **nosql show** statement.
+
+This behaviour means that <span style='color:blue'>property values can never be deleted</span>, if a property needs to be removed from an object it should be assigned the **null** value. 
+
+
+##	 Syntax
+<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>&lt;update statement&gt; ::= nosql update
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&lt;props-assignment&gt;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;in {**UNIVERSE-NAME**|**SET-NAME**}
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;[ {where|except} **FILTER-CONDITION** ]
+&nbsp;<br/>&nbsp;<br/>
+&lt;props-assignment&gt; ::=\{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**PROP-NAME**=   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **NOSQL-DOCUMENT**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **LITERAL**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **OBJECT-VALUE**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **TSQL-EXPRESSION**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}[,..n]<br/>
+&nbsp;&nbsp;}[,..n]
+
+</span>
+Where:
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE-NAME**</span> specifies the universe where returned objects exist.
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**SET-NAME**</span> limits the result to objects belonging to the set specified. 
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**PROP-NAME**</span> states the name and type of the property to be assigned. It takes 
+the form of a type prefix followed by an identifier. For example: <span style="color:blue;">$Name</span> would be property for a string value and <span style="color:blue;">#Age</span> would be a property for an integer value.
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**LITERAL**</span> is a literal value of type <span style="color:blue;">string</span>, 
+<span style="color:blue;">integer</span>, <span style="color:blue;">real</span> or the <span style="color:blue;">null</span> keyword.
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span> is an expression returning a value from the current filtered object, for example:  
+    - <span style="color:blue;">$Name</span>:  string value of property **Name** for the current object being filtered, 
+	- <span style="color:blue;">#Children[1].Age</span>:  integer value of property **Age**, for the second object in the value for the property Children (defined as array) for the current object
+	- The metadata keyword <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>?</span> returns the reference identifier (as an integer value) for the object being evaluated, 
+	- The metadata suffix <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>?count</span> returns the number of elements in an array. For example 
+	<span style="color:blue;">#Children?count</span>, returns an integer with the number of elements in array property **Children** for the current object. 	
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**TSQL-EXPRESSION**</span> is any valid T-SQL expression not using T-SQL tables. It can be built
+using T-SQL literals, existing T-SQL variables, T-SQL arithmetic operators, T-SQL functions and <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span>. For 
+example <span style="color:blue;">DATEADD(day, #deadline, '2018/01/01')</span> or <span style="color:blue;">$Name+' '+ISNULL($LastName,'N.A.')</span> 
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**NOSQL-DOCUMENT**</span> is a NoSqlOnSql document. Notice that, in addition to 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**LITERALS**</span>, this document can contain as valid values 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span> and <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**TSQL-EXPRESSION**</span> items.  
+
+
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**FILTER-CONDITION**</span> states the filter. A filter expression is 
+a combination of compare and boolean operators applied to values (literals or belonging an object) and functions, that can be evaluated to a **TRUE** or **FALSE** value. The filter is evaluated for each object in 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE-NAME**</span> or 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**SET-NAME**</span>. If the filter evaluation returns **TRUE**, then the object 
+passes the filter. The <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>where</span> clauses returns all objects that pass the filter. The 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>except</span> clause returns all the objects except those that pass the filter.  
+
+    Filter expressions are made of:
+
+    - Boolean operators: <span style="color:blue">and</span> & <span style="color:blue">or</span>
+	- Compare operators: <span style="color:blue;font-weight:bold">=</span>, <span style="color:blue;font-weight:bold">&gt;</span>,<span style="color:blue;font-weight:bold">&gt;=</span>  
+	      <span style="color:blue;font-weight:bold">&gt;&lt;</span>, <span style="color:blue;font-weight:bold">&gt;=</span> and <span style="color:blue;font-weight:bold">&lt;=</span>  
+	- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**TSQL-EXPRESSION**</span> items
+	- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span> expressions. In a compare operation 
+		the <span style='color:blue;font-weight:bold'>\*</span> symbol can be used as an array index with the meaning of **any** value. For 
+		example <span style="color:blue">$Children[\*].Name='Pol'</span>  would pass if the current object has a property **Children**, of type **array**, and any member of it is an object whose
+		**Name** property, of type **string**, equals to **Pol**.
+
+
+
+
+##	 Sample
+[/markdown]
+[code]
+
+nosql create springfield override	                                          -- Create a new universe called SpringField, delete any previous storage of the same name
+
+[/code]
+
+[markdown]
+&nbsp;
+[/markdown]
+[data]
+
+
+[/data]
+
+

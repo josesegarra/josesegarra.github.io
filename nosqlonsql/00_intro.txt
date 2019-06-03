@@ -1,0 +1,74 @@
+﻿[markdown]
+# What is NoSqlOnSql
+
+NoSqlOnSql is a superset of SQL which primarily provides optional capabilities for storing, retrieving and managing document-oriented information. Document-oriented 
+databases are one of the main categories of NoSQL databases. Being a superset of SQL, _**any SQL statement is a valid NoSqlOnSql statement**_. NoSqlOnSql is implemented 
+as a transpiler for Microsoft SQL Server: a NoSqlOnSql script is compiled into a SQL script that can be run directly by Sql Server.
+
+NoSqlOnSql is capable of creating, updating and querying documents without any schema definition. NoSqlOnSql documents are defined using a notation similar to JSON. 
+
+NoSqlOnSql offers a query language based on statementsfor managing NoSqlOnSql documents. The main focus of NoSqlOnSql is integration and leveraging the existing mechanisms and paradigms of normal SQL:
+
+* NoSqlOnSql types of statement and their syntax mimick those of SQL 
+* The result of a NoSlqOnSql statement is the same as its equivalent SQL statement
+* Being a superset, SQL statements are allowed in NoSqlOnSql and can be intermixed
+
+## Key Points
+
+- Being a superset of SQL, all construct, built-ins, functions and statements of SQL are available.
+- NoSqlOnSql is transpiled to the SQL version of Sql Server (called TSQL), so to execute transpiled NoSqlOnSql code you just need [Sql Server]
+- NoSqlOnSql follows a only-write paradigm: data is never deleted or updated. If a value needs to be changed, a new version of the value is created. By default, only the latest version of a value is available, but 
+there are mechanisms to dig into the history of changes of a document. This makes a NoSqlOnSql storage a valid media to implement a **blockchain**.
+- All semantic and type information is embedded in NoSqlOnSql statements as this information is not available anywhere else. Although internally it uses a SQL table as storage mechanism, the structure of that table 
+gives no hint of the type of data it holds. NoSqlOnSql statements are very powerful, but they:
+    * require to explictly specify metadata (ie: types of fields retrieved) that in SQL is defined "outside of the statement" (ie: in the table structure).
+	* need to be transpiled before executed
+	* need to pivot from a "vertical record structure" to an "horizontal" one. So performance of NoSqlOnSql statements is usually lower than pure SQL ones.
+
+
+## How does NoSqlOnSql look like ?
+
+The NoSqlOnSql syntax resembles that of SQL, it follows the same paradigm of statements, data sets and operations on data sets. NoSqlOnSql is fully integrated in SQL, both types 
+of statements and their results can be intermixed.  
+
+As an example is worth a thousand words, the example below is rather self-explanatory. At this moment, do not pay too much attention to the syntax, just focus on the general feeling and how NoSqlOnSql mixes with SQL.
+
+[Sql Server]:http://www.microsoft.com/sqlserver
+
+[/markdown]
+
+[code]
+-- Create SQL data
+drop table if exists positions
+create table positions(id nvarchar(2),name nvarchar(30))
+insert into positions(id,[name]) select 'CA','Catcher' union select 'PI','Pitcher' union  select 'B1','First Baseman' 
+
+-- Create NOSQLONSQL data
+nosql create myteam override																											              
+nosql insert {Name: 'Ned',LastName:'Smith',Age: 38,Position:'CA'}  into myteam
+nosql insert {Name: 'John',Position:'PI'}  into myteam
+nosql insert {Name: 'Ted',LastName:'Nelson',Allergies:['Bees ','Peanuts ']}  into myteam
+nosql update $Position='B1' in myteam where $Name='Ted'
+
+-- Query SQL and NOSQLONSQL and JOIN the results
+select Who,positions.name Position,Allergies from 
+(
+   nosql select 
+             $Name +' '+isnull($LastName,'--') Who
+            ,$Position as posid
+            ,concat($Allergies[0],$Allergies[1]) allergies
+          from myteam
+) as team 
+inner join positions 
+on team.posid=positions.id   
+[/code]
+[markdown]
+This script returns:
+[/markdown]
+[data]
+     |Who        |Position      | Allergies
+     |---------- |--------------|-------------
+ 1   |Ted Nelson |First Baseman |Bees Peanuts
+ 2   |Ned Smith  |Catcher| null
+ 3   |John --    |Pitcher| null
+[/data]

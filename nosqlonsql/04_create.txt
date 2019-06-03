@@ -1,0 +1,37 @@
+﻿
+
+[markdown]
+# Create
+
+This statement creates a NoSqlOnSql universe. This is the only NoSqlOnSql statement that creates a persistent SQL object in the target database. 
+
+##	 Syntax
+<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>&lt;create statement&gt; ::= nosql create **UNIVERSE_NAME** {override|span}</span>
+
+Where:
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE_NAME**</span>, is the name of the universe. It must start with an alpha character (between *a* and *z* or _ underscore), the rest of characters must be either alpha or numeric (between *0* and *9*). The 
+universe is implemented as a SQL Server table with the same name as the universe and the **NOSQL_** prefix. 
+
+- The stament must include one compulsory modifier:
+    - <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>override</span> any previous universe of the same name is deleted
+    - <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>keep</span> if a previous universe of the same name already exists, it is maintained
+
+
+##	 Samples
+[/markdown]
+
+[code]
+
+-- Creates a new universe called SpringField, delete any previous universe of the same name
+-- After execution there is table named NOSQL_springfield that is empty
+nosql create springfield override
+
+-- If a universe called newyork already exists this statement does nothing
+-- else the universe is created.
+-- After execution there is table named NOSQL_newyork that might have data
+nosql create newyork keep
+
+[/code]
+
+

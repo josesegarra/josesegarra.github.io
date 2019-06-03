@@ -1,0 +1,120 @@
+﻿
+
+[markdown]
+# Select
+
+This statement retrieves object references and values for them from an universe or subset in a universe. The statement returns a SQL resulset, with one row for each object, columns for each row are based on values for the object. 
+The statement allows to include conditions (ie: filter), so that the only objects matching these conditions are returned.
+
+The objects can be returned to the default output stream (<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>&lt;retrieve-list&gt;</span> mode) 
+or assigned to specific T-SQL scalar variables (<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>&lt;assign-list&gt;</span> mode). In this second case, the result set should not return more than one row (this can be controlled with the 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>TOP</span> clause). 
+
+##	 Syntax
+<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>&lt;select statement&gt; ::= nosql select 
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;\[ TOP \[TIES\] ( **INTEGER-EXPRESSION** ) \[ PERCENT \] \]
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;{&lt;retrieve-list&gt;|&lt;assign-list&gt;}
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;from {**UNIVERSE-NAME**|**SET-NAME**}
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;[ {where|except} **FILTER-CONDITION** ]
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;[order by { **COLUMN-ALIAS**|**COLUMN-NUMBER** [desc] }[,..n] ]       
+&nbsp;<br/>
+&lt;retrieve-list&gt; ::=\{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;?   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **OBJECT-VALUE**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **LITERAL**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **TSQL-EXPRESSION**
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} [ [ AS ] **COLUMN-ALIAS** ]  
+&nbsp;&nbsp;}[,..n]
+<br/>&nbsp;<br/>&lt;assign-list&gt; ::={<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[new {string|int|real|object}] **@VARIABLE**=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;?   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **OBJECT-VALUE**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **LITERAL**   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| **TSQL-EXPRESSION**<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;}[,..n]
+<br/>&nbsp;
+
+</span>
+Where:
+
+- The optional <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>TOP</span> clause limits the number of rows returned. If this clause is present 
+the statement returns a maximum of <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**INTEGER-EXPRESSION**</span> rows. For this clause to makes 
+sense, an order needs to be specified on the statement with the <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>order by</span> clause.
+
+   The number of rows returned can be an absolute value or, if <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>PERCENT</span> is defined, a percentage of the number of total rows. 
+   The <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>TIES</span> option specifies if ties for the last row are returned or not.
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE-NAME**</span> specifies the universe where returned objects exist.
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**SET-NAME**</span> limits the result to objects belonging to the set specified. 
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**LITERAL**</span> is a literal value of type <span style="color:blue;">string</span>, 
+<span style="color:blue;">integer</span>, <span style="color:blue;">real</span> or the <span style="color:blue;">null</span> keyword.
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span> is an expression returning a value from the current filtered object, for example:  
+    - <span style="color:blue;">$Name</span>:  string value of property **Name** for the current object being filtered, 
+	- <span style="color:blue;">#Children[1].Age</span>:  integer value of property **Age**, for the second object in the value for the property Children (defined as array) for the current object
+	- The metadata keyword <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>?</span> returns the reference identifier (as an integer value) for the object being evaluated, 
+	- The metadata suffix <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>?count</span> returns the number of elements in an array. For example 
+	<span style="color:blue;">#Children?count</span>, returns an integer with the number of elements in array property **Children** for the current object. 	
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**TSQL-EXPRESSION**</span> is any valid T-SQL expression not using T-SQL tables. It can be built
+using T-SQL literals, existing T-SQL variables, T-SQL arithmetic operators, T-SQL functions and <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span>. For 
+example <span style="color:blue;">DATEADD(day, #deadline, '2018/01/01')</span> or <span style="color:blue;">$Name+' '+ISNULL($LastName,'N.A.')</span> 
+
+- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**FILTER-CONDITION**</span> states the filter. A filter expression is 
+a combination of compare and boolean operators applied to values (literals or belonging an object) and functions, that can be evaluated to a **TRUE** or **FALSE** value. The filter is evaluated for each object in 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**UNIVERSE-NAME**</span> or 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**SET-NAME**</span>. If the filter evaluation returns **TRUE**, then the object 
+passes the filter. The <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>where</span> clauses returns all objects that pass the filter. The 
+<span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>except</span> clause returns all the objects except those that pass the filter.  
+
+    Filter expressions are made of:
+
+    - Boolean operators: <span style="color:blue">and</span> & <span style="color:blue">or</span>
+	- Compare operators: <span style="color:blue;font-weight:bold">=</span>, <span style="color:blue;font-weight:bold">&gt;</span>,<span style="color:blue;font-weight:bold">&gt;=</span>  
+	      <span style="color:blue;font-weight:bold">&gt;&lt;</span>, <span style="color:blue;font-weight:bold">&gt;=</span> and <span style="color:blue;font-weight:bold">&lt;=</span>  
+	- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**TSQL-EXPRESSION**</span> items
+	- <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**OBJECT-VALUE**</span> expressions. In a compare operation 
+		the <span style='color:blue;font-weight:bold'>\*</span> symbol can be used as an array index with the meaning of **any** value. For 
+		example <span style="color:blue">$Children[\*].Name='Pol'</span>  would pass if the current object has a property **Children**, of type **array**, and any member of it is an object whose
+		**Name** property, of type **string**, equals to **Pol**.
+
+
+- In <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>&lt;retrieve-list&gt;</span> mode, each returned value has a **name** or **alias**. This 
+**alias** can be:
+    - generated automatically by the NoSqlOnSql transpiler based on the value path 
+	- or defined by the user as a <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>COLUMN-ALIAS</span>. Note that the <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>AS</span> clause
+is completely optional, it is included only for consistency with T-SQL
+
+- In <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>&lt;assign-list&gt;</span> mode, each fetched value 
+is assigned to a T-SQL <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>**@VARIABLE**</span>. This variable must either:
+
+    - be an already existing variable previously defined 
+    - defined on the fly using <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>new string</span>,   <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>new 
+int</span>, <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>new real</span> or <span style='display:inline-block;border: 1px solid #AAA;padding-left:2px;padding-right:2px;font-family: Consolas;color:#666'>new object</span>, depending on 
+the type of the returned value. Notice that implicit conversions and T-SQL [data type precendece] applies
+
+
+[data type precendece]: https://docs.microsoft.com/en-us/sql/t-sql/data-types/data-type-precedence-transact-sql?view=sql-server-2017
+
+
+##	 Sample
+[/markdown]
+[code]
+
+nosql create springfield override	                                          -- Create a new universe called SpringField, delete any previous storage of the same name
+
+[/code]
+
+[markdown]
+&nbsp;
+[/markdown]
+[data]
+
+
+[/data]
+
+

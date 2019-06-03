@@ -1,0 +1,142 @@
+﻿[markdown]
+# NoSqlOnSql Internals
+
+A NoSqlOnSql universe is implemented using an expanded version of the Entity-Attribute-Value Model [EVA]. In NoSqlOnSql each document is modelled to an EVA entity, as there are two types of 
+documents (objects and arrays) there are also two types of entities:
+
+* For object entities: each property represents a named attribute belonging to that ENTITY. Access to the attribute is by NAME.
+* For array entities: each array member represents an unnamed attribute  belonging to that ENTITY. Access to the attribute is by attribute ORDER.
+
+
+[/markdown]
+[quote]
+     The main characteristic of EAV schemas is that they have a “store everything, query nothing” property. You can store
+     whatever you like, because it's so generic. Because it's so generic, you can't query it, because nothing really ever
+     means something.
+	 
+        Roland Bouman 2009
+[/quote]
+[markdown]
+**BELOW SOME IDEAS from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC61391/** 
+
+EAV design is potentially attractive for databases with complex and constantly changing schemas that reflect rapidly evolving knowledge in 
+scientific domains. Here, when a conventional design is used, the tables (and the code that manipulates them, plus the user interface) need continuous 
+redesign with each schema revision. EAV design, by simplifying the schema, may provide relative insulation against such consequences 
+of change. Along with simplification comes the potential for domain independence. With proper design, none of the tables in the 
+system (and only a modest proportion of the code) are domain-specific. This architecture should therefore be portable across scientific domains.
+
+
+
+[EVA]:http://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model 
+[EVACR]: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC61391/
+
+
+Drawbacks of EAV Design
+
+Most production “EAV” databases also use conventional tables when it makes sense to do so. That is, their schema is heterogeneous. It is therefore important to know how to choose between a conventional and an EAV representation for a given class of data. A rational decision requires an understanding of the drawbacks of EAV design:
+
+▪
+As discussed later, considerable up-front programming is needed to do many tasks that a conventional architecture would do automatically. On the other hand, such programming needs to be done only once, and availability of generic EAV tools could remove this limitation.
+
+▪
+EAV design is less efficient than a conventional structure for bulk retrieval of numerous objects at a time. (For object-at-a-time retrieval, as through a Web browser, the volume of data is small enough that the difference is not noticeable.)
+
+▪
+The process of performing complex attribute-centric queries, which are based on values of attributes, and returning a set of objects is both significantly less efficient as well as technically more difficult. An example of an attribute-centric query in the EPRS context would be “Show me female patients less than 50 years old, with persistently elevated direct bilirubin levels over the last year, whose alanine and aspartate transaminase levels have been consistently normal.”
+
+▪
+For schemas that are relatively static or simple (e.g., databases for business applications, such as inventory or accounting), the overhead of EAV design exceeds its advantages.
+
+
+
+https://academic.oup.com/jamia/article/6/6/478/779764
+[JSON]: https://en.wikipedia.org/wiki/JSON
+[1]:https://blogit.create.pt/goncalomelo/2018/12/20/query-performance-for-json-objects-inside-sql-server/
+[2]:https://hackernoon.com/one-sql-cheat-code-for-blazing-fast-json-queries-d0cb6160d380
+[3]:https://dbain.wales/2018/10/16/performance-of-json-in-sql-server/
+
+
+
+
+https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model
+Metadata has been moved to THE QUERY LANGUAGE!!
+
+https://www.sqlservercentral.com/editorials/relationally-divided-over-eav
+http://publications.sqltopia.com/The%20E,%20the%20A%20and%20the%20V.pdf
+https://inviqa.com/blog/eav-data-model
+
+
+
+
+
+The fact that EAV handles only non-empty attributes means that there's no need to reserve additional storage space for attributes whose values would be null. This makes the EAV model quite space efficient.
+
+Physical data format is very clean and is similar to XML, allowing data to be easily mapped to XML format; it only requires replacing the attribute name with start-attribute and end-attribute tags.
+
+EAV model is excellent for rapidly evolving applications because it protects us against consequences of constant change. We can simply record new data of any structure without the need to modify the database schema.
+
+When considering EAV it is important to identify whether the data is sparse and numerous since the complexity of EAV design exceeds its advantages when used for inappropriate data set. It would be more appropriate to opt for conventional tables for schemas that are relatively static and/or simple.
+
+A major downside of EAV is its lower efficiency when retrieving data in bulk in comparison to conventional structure. In EAV model the entity data is more fragmented and so selecting an entire entity record requires multiple table joins.  What is more, when working with large volumes of EAV data, it can be necessary to transiently or permanently convert between columnar and row/EAV -modelled representation of the same set of data. The operation can be error-prone and CPU intensive.
+
+Another limitation of EAV is the fact that we need additional logic in place to complete tasks that would be done automatically by conventional schemas. However, existing EAV tools can be implemented to reduce the overheads of this.
+
+Finally, understanding the EAV model does require time. It has a definite learning curve, so junior developers may struggle working with this model, before they can truly understand the concept.
+
+
+The Entity-Attribute-Value (EAV) data model was devised originally in the form of LISP association lists, as a general means of information representation in the context of artificial intelligence research. It was adapted subsequently for use in the clinical patient record: the pioneering HELP system5,6 and the Columbia-Presbyterian clinical data repository,7,8 for example, have an EAV component. Our group has used EAV for clinical study data management systems9 and neuroscience data.10
+
+In the EAV model, data are conceptually stored in a single table with three columns: an Entity (the object being described), an Attribute (an aspect of the object being described), and the Value for that attribute.
+
+The drawback of an EAV system is that the data's physical organization is significantly different from the way users conceptualize it (as one column per attribute). Therefore, when presenting EAV data, it must be transiently converted (“pivoted”) into a conventional representation through fairly elaborate metadata-driven code. The need to create this code before the equivalent of a “Hello, world” application can be created constitutes a significant hurdle. Once this code is built and tested, however, applications can be constructed rapidly. Another potential problem is that repeated on-demand pivoting can exact a performance penalty when manipulating large volumes of data.
+
+In traditional EAV approaches, values are atomic or simple (e.g., numbers representing values of hemoglobin). The EAV/CR approach combines object-oriented concepts with the basic EAV model. Specifically, an object in the database must belong to a particular class. The set of attributes applicable to that object are constrained based on its class, and values may be IDs of other objects of different classes or the same class. The last feature implements relationships between data objects. Classes and attributes are analogous to tables and columns in a conventional database: the difference is that both of these contain additional meta-information that applies to how data are presented to the user.
+
+
+EAV/CR, despite its name, supports hybrid designs in which certain classes may be represented physically as conventional tables, with one column per attribute, if the system designer determines that the number of objects in this class will be numerous enough that conventional representation will be more efficient. The metadata, however, record how a class is physically represented so as to allow dynamic generation of the correct code to access individual entities.
+
+
+ In an EAV/CR schema, the physical and conceptual schemas often are dramatically different, especially when much of the data are stored in EAV form: numerous object instances from different classes are stored in the same set of tables. Such tools are therefore of very limited use. Further, data that are fetched from the physical schema for individual attributes through individual SQL queries must be transformed and presented in terms of the conceptual schema, with one column per attribute, to make the results of a query understandable. This involves merging and pivoting the results of individual operations, a nontrivial and laborious operation when performed manually through SQL programming.
+
+
+Denormalization offers robustness (ie: if the object Maude is deleted, the information for Todd & Rodd is still correct) and speed (when retreving the values for 
+Todd and Rodd and additional retrieval of Maude is not needed). On the other hand it creates redundancies (Maude data is stored several times), can be difficult to 
+maintain (if Maude's data changes we need to update Todd & Rodd too), and cannot handle symmetric and anti-symmetric relationships (if we wanted to store in Maude 
+a property "Son" with Todd's data, we would run into and infinite loop).
+
+Notice that JSON format is a denormalized format: all values related to a JSON document must be included in the JSON document itself (or be part of other JSON documents that are 
+included in the original JSON document). 
+
+NoSqlOnSql on the other hand uses a denormalized approach. All nested documents are broken into different documents, and the relationships are maintained by 
+assigning references where appropiate. Although this process is transparent to the end user, the user can take advantage of this fact and insert its own 
+references to other existing documents in an universe.
+
+## Cross-Universe
+
+The scope of a document references is the universe: a document as such only exists in a specific **universe**, and all its properties must exist in the 
+same **universe**. To be NoSqlOnSql complete (ie: full and queriable) a document reference and all its values must live in the same **universe**, this means 
+that the whole document is stored in the SQL table of that specific universe. 
+
+If references to objects are kept in different universes, and completeness is a requirement then it should be maintained outside the NoSqlOnSql layer (ie: at the 
+SQL or application level). 
+
+A universe is tighly coupled to (and only to) a single SQL table, so, providing that completeness is already taken care of, if it is possible to scale-up tables 
+it should be straightforward to scale up as well NoSqlOnSql. *TODO: This needs more research and an extension to the language*
+
+## Queriable
+
+NoSqlOnSql does not implement a referential data model. Although it can be implemented using document references, NoSqlOnSql does not enforce, neither allows 
+querying of such a model. Queries in NoSqlOnSql are implemented as filters on specific documents. Nevertheless is very easy to transform NoSqlOnSql queries into SQL 
+views which can be used as blocks in a normal SQL statement, thus allowing building up a referential model from the documents. 
+
+## Inmutable
+
+By design a NoSqlOnSql universe is a readable and append-only estructure: it is not possible to delete any document reference or value recorded on it. Updates to properties of existing documents generate new rows with the 
+values, but the "overwritten" values are still present in the universe. On normal operations, the NoSqlOnSql transpiler ensures that the lates value of each property is used. On audit operations, the history of a document can 
+be queried, this provides audit and traceability operations. 
+
+An additional benefit of an append-only estructure, is data signign inmutability. NoSqlOnSql leverages this capacity defining block signing operation (aka blockchain). These operations combined with a public 
+ledger offer a solid mechanism ensuring traceabilty and anti-tampering. 
+
+[/markdown]
+

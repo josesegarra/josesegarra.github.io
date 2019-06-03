@@ -1,0 +1,114 @@
+﻿
+
+[markdown]
+# Universes
+
+NoSqlOnSql breaks documents them into smaller pieces (ie: attributes assignments) which are stored as individual rows on a regular SQL table following a hierarchy layout. This SQL 
+table is known in NoSqlOnSql as a **universe**. In NoSqlOnSql a **universe** is identified by a name. 
+
+Every NoSqlOnSql piece of information is stored in a **universe**. A NoSqlOnSql document is made of two types of information: the values that made 
+up the document (ie: strings, reals, integers,..) and the "shape" of these values (it is an array or object ? how many items ? what 
+are the keys ?...). So there are only two types of data that are stored in the universe: document references and values belonging 
+to a document reference. 
+
+## Denormalization
+
+A document is *denormalized* if all its related information is stored within the document itself. Depending on the use case, it 
+might make sense to keep all documents denormalized or on the other hand, to keep related information in different documents and 
+maintain this relation among them using references. 
+
+For example the following documents (representing three persons) are denormalized:
+
+[/markdown]
+[data]
+{  
+    Name: 'Maude',Lastname:'Flanders'
+}
+
+{  
+    Name: 'Todd',Lastname:'Flanders'
+}
+
+{  
+    Name: 'Rodd',Lastname:'Flanders'
+}
+[/data]
+[markdown]
+If we wanted to store the fact that Maude is the mother of Todd and Rodd, we could do this in a denormalized manner:
+[/markdown]
+[code]
+
+{  
+    Name: 'Todd',Lastname:'Flanders', 
+	Mother:{  
+		Name: 'Maude',Lastname:'Flanders'
+	}
+}
+
+{  
+    Name: 'Rodd',Lastname:'Flanders', 
+	Mother:{  
+		Name: 'Maude',Lastname:'Flanders'
+	}
+}
+[/code]
+[markdown]
+Or break denormalization by using document references:
+[/markdown]
+[code]
+
+{  
+    Name: 'Maude',Lastname:'Flanders'
+}
+
+{  
+    Name: 'Todd',Lastname:'Flanders', Mother: *(reference to Maude)*	-- OR so it looks like a long line this one long line this one long line this one long line this one and the last word	
+}
+
+{  
+    Name: 'Rodd',Lastname:'Flanders', Mother: *(reference to Maude)*
+}
+[/code]
+
+[markdown]
+Denormalization offers robustness (ie: if the object Maude is deleted, the information for Todd & Rodd is still correct) and speed (when retreving the values for 
+Todd and Rodd and additional retrieval of Maude is not needed). On the other hand it creates redundancies (Maude data is stored several times), can be difficult to 
+maintain (if Maude's data changes we need to update Todd & Rodd too), and cannot handle symmetric and anti-symmetric relationships (if we wanted to store in Maude 
+a property "Son" with Todd's data, we would run into and infinite loop).
+
+Notice that JSON format is a denormalized format: all values related to a JSON document must be included in the JSON document itself (or be part of other JSON documents that are 
+included in the original JSON document). 
+
+NoSqlOnSql on the other hand uses a denormalized approach. All nested documents are broken into different documents, and the relationships are maintained by 
+assigning references where appropiate. Although this process is transparent to the end user, the user can take advantage of this fact and insert its own 
+references to other existing documents in an universe.
+
+## Cross-Universe
+
+The scope of a document references is the universe: a document as such only exists in a specific **universe**, and all its properties must exist in the 
+same **universe**. To be NoSqlOnSql complete (ie: full and queriable) a document reference and all its values must live in the same **universe**, this means 
+that the whole document is stored in the SQL table of that specific universe. 
+
+If references to objects are kept in different universes, and completeness is a requirement then it should be maintained outside the NoSqlOnSql layer (ie: at the 
+SQL or application level). 
+
+A universe is tighly coupled to (and only to) a single SQL table, so, providing that completeness is already taken care of, if it is possible to scale-up tables 
+it should be straightforward to scale up as well NoSqlOnSql. *TODO: This needs more research and an extension to the language*
+
+## Queriable
+
+NoSqlOnSql does not implement a referential data model. Although it can be implemented using document references, NoSqlOnSql does not enforce, neither allows 
+querying of such a model. Queries in NoSqlOnSql are implemented as filters on specific documents. Nevertheless is very easy to transform NoSqlOnSql queries into SQL 
+views which can be used as blocks in a normal SQL statement, thus allowing building up a referential model from the documents. 
+
+## Inmutable
+
+By design a NoSqlOnSql universe is a readable and append-only estructure: it is not possible to delete any document reference or value recorded on it. Updates to properties of existing documents generate new rows with the 
+values, but the "overwritten" values are still present in the universe. On normal operations, the NoSqlOnSql transpiler ensures that the lates value of each property is used. On audit operations, the history of a document can 
+be queried, this provides audit and traceability operations. 
+
+An additional benefit of an append-only estructure, is data signign inmutability. NoSqlOnSql leverages this capacity defining block signing operation (aka blockchain). These operations combined with a public 
+ledger offer a solid mechanism ensuring traceabilty and anti-tampering. 
+
+[/markdown]
+
