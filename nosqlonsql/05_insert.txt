@@ -7,7 +7,7 @@ This statement stores a document into the root level of an universe.
 
 ##	 Syntax
 <span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>
-&lt;insert statement&gt; ::= nosql insert [[new object] **@VARIABLE=**] 
+&lt;insert statement&gt; ::= nosql insert [[new] **@VARIABLE=**] 
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**NOSQL-DOCUMENT** into **UNIVERSE-NAME**</span>
 
 Where:
@@ -31,7 +31,7 @@ documents.
 
 nosql create springfield override	                                          -- Create a new universe called SpringField, delete any previous storage of the same name
     
-nosql insert new object @Ned={Name: 'Ned'	                                  -- Ned exists in Springfield
+nosql insert new @Ned={Name: 'Ned'	                                  -- Ned exists in Springfield
         ,Likes:['Church','Bible']
 		} into springfield               
 
