@@ -6,7 +6,7 @@
 This statement creates a NoSqlOnSql universe. This is the only NoSqlOnSql statement that creates a persistent SQL object in the target database. 
 
 ##	 Syntax
-<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>&lt;create statement&gt; ::= nosql create **UNIVERSE_NAME** {override|span}</span>
+<span style='display:inline-block;border: 1px solid #AAA;padding:5px;font-family: Consolas;margin-left:35px;color:#666;min-width:600px'>&lt;create statement&gt; ::= nosql create **UNIVERSE_NAME** {override|keep}</span>
 
 Where:
 
