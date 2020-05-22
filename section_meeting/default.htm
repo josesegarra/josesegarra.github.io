@@ -9,6 +9,8 @@
 			var code=document.getElementById("code");
 			if (code) code=code.value;
 			if (!name || !code) return alert("Missing name or code");
+			document.getElementById("go").style.display="none";
+
 			
 			//alert(name+" "+code);
 			render();
@@ -33,7 +35,7 @@
 		<tr><td colspan='2'>&nbsp;</td></tr>
 		<tr><td>Code</td><td><input type="text" id="code" value=""  size="8"></td></tr>
 		<tr><td colspan='2'>&nbsp;</td></tr>
-		<tr><td colspan='2'><input type="button" onclick="javascript:go();" value="GO"></td></tr>
+		<tr><td colspan='2'><input type="button" id="go" onclick="javascript:go();" value="GO"></td></tr>
 	</table>
 	<div id="blocks">
 	</div>
