@@ -1,7 +1,7 @@
 
 
-var width = 8
-var height = 8
+var width = 5
+var height = 5
 var possibleColours = ['b', 'y', 'r', 'g']
 var colourMap = {
     b: 'blue',
