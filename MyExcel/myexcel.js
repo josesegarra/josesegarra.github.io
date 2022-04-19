@@ -496,7 +496,10 @@ $JExcel = {
     function generateCell(cell, column, row) {
         var s = '<c r="' + cellName(column, row) + '"';
         if (cell.s) s = s + ' s="' + cell.s + '" ';
-        if (isNaN(cell.v)) return s + ' t="inlineStr" ><is><t>' + escape(cell.v) + '</t></is></c>';
+        if (isNaN(cell.v)){
+            if (cell.v[0]!='=') return s + ' t="inlineStr" ><is><t>' + escape(cell.v) + '</t></is></c>';            // If not a formula
+            return s+' t="str"><f>'+cell.v.substring(1)+"</f></c>";
+        }
         return s + '><v>' + cell.v + '</v></c>';
     }
 
@@ -619,7 +622,7 @@ $JExcel = {
             s = sheets.get(s);
             if (isNaN(column) && isNaN(row)) return s.set(value, style);                                                            // If this is a sheet operation
             if (!isNaN(column)) {                                                                                                    // If this is a column operation
-                if (!isNaN(row)) return setCell(s.getCell(column, row), value, style);                                                // and also a ROW operation the this is a CELL operation
+                if (!isNaN(row)) return setCell(s.getCell(column, row), value, style);                                                // and also a ROW operation then this is a CELL operation
                 return setColumn(s.getColumn(column), value, style);                                                                // if not we confirm than this is a COLUMN operation
             }
             return setRow(s.getRow(row), value, style);                                                                             // If got here, thet this is a Row operation
