@@ -1,2 +1,2 @@
 # jsegarra1971.github.io
-Static website
+Static website.
