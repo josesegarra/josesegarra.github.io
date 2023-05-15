@@ -1,0 +1,7 @@
+[
+    { "name":"Akamai HELP", "description": " Some text on the data that is showed here", "data": "akamai.help.json" },
+    { "name":"CB1 - Acquia Backend" , "description": " Some text on CB1 data ", "data": "cb1.prod.json" },
+    { "name":"CB2 ", "description": " Some text on CB2 data", "data": "cb2.prod.json" },
+    { "name":"CB3 ", "description": " Some text on CB3 data", "data": "cb3.prod.json" },
+    { "name":"CB4 ", "description": " Some text on CB4 data", "data": "cb4.prod.json" }
+]
